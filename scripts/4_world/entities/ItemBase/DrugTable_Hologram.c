@@ -23,15 +23,12 @@ modded class Hologram
             {
                 Object obj_collided = collided_objects[i];
 
-                if (obj_collided.IsInherited(Echo_DrugTable_Holo))
+                // Sprawdzamy po nazwie zamiast po typie klasy
+                string obj_name = obj_collided.GetType();
+                
+                if (obj_name == "Echo_DrugTable_Holo" || obj_collided.IsInherited(Echo_DrugTable))
                 {
-                    Echo_DrugTable_Holo var_DrugTableHolo = Echo_DrugTable_Holo.Cast(obj_collided);
-                    return var_DrugTableHolo;
-                }
-                if (obj_collided.IsInherited(Echo_DrugTable))
-                {
-                    Echo_DrugTable var_DrugTable = Echo_DrugTable.Cast(obj_collided);
-                    return var_DrugTable;
+                    return ItemBase.Cast(obj_collided);
                 }
             }
         }
@@ -42,40 +39,17 @@ modded class Hologram
     {
         ItemBase item_in_hands = ItemBase.Cast(m_Player.GetHumanInventory().GetEntityInHands());
 
-        if (item_in_hands.IsInherited(Echo_DrugTable_Kit))
+        if (item_in_hands && item_in_hands.IsKindOf("Echo_DrugTable_Kit"))
             return "Echo_DrugTable_Holo";
 
         return super.ProjectionBasedOnParent();
     }
 
-    override EntityAI PlaceEntity(EntityAI entity_for_placing)
-{
-    // Jeśli to nasz kit
-    if (entity_for_placing.IsKindOf("Echo_DrugTable_Kit"))
-    {
-        vector pos = GetProjectionPosition();
-        vector ori = GetProjectionOrientation();
-
-        // Tworzymy stół
-        Object table = GetGame().CreateObject("Echo_DrugTable", pos, false, true, true);
-        table.SetPosition(pos);
-        table.SetOrientation(ori);
-
-        // Usuwamy kit
-        entity_for_placing.Delete();
-
-        return EntityAI.Cast(table);
-    }
-
-    return super.PlaceEntity(entity_for_placing);
-}
-
-    
     override void EvaluateCollision(ItemBase action_item = null)
     {
         ItemBase projectionItem = m_Parent;
 
-        if (projectionItem.IsInherited(Echo_DrugTable))
+        if (projectionItem && projectionItem.IsKindOf("Echo_DrugTable"))
         {
             if (IsCollidingZeroPos())
             {

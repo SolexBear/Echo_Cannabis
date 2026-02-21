@@ -34,7 +34,7 @@ modded class ActionDeployObject
         action_data.m_MainItem.SetIsPlaceSound(false);
         action_data.m_MainItem.SoundSynchRemoteReset();
 
-        // Nasz kit
+        // Nasz kit - TUTAJ NAPRAWIAMY PROBLEM Z OPADANIEM
         if (action_data.m_MainItem.IsKindOf("Echo_DrugTable_Kit"))
         {
             Hologram holo = action_data.m_Player.GetHologramServer();
@@ -44,8 +44,9 @@ modded class ActionDeployObject
                 vector pos = holo.GetProjectionPosition();
                 vector ori = holo.GetProjectionOrientation();
 
-                // Jeśli model ma zły pivot, możesz wymusić poprawną wysokość:
-                // pos[1] = GetGame().SurfaceY(pos[0], pos[2]);
+                // ✅ WAŻNE: Ustaw prawidłową wysokość względem terenu
+                // Bez tego stół pada pod mapę!
+                pos[1] = GetGame().SurfaceY(pos[0], pos[2]) + 0.05;
 
                 Object table = GetGame().CreateObject("Echo_DrugTable", pos, false, true, true);
                 table.SetPosition(pos);
@@ -58,4 +59,4 @@ modded class ActionDeployObject
 
         super.OnEndServer(action_data);
     }
-};
+}
